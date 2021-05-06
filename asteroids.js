@@ -88,8 +88,6 @@ window.onload = function init() {
 		'orthogonal': function () {selection = projection_modes.ORTHOGONAL;},
 		'perspective': function () {selection = projection_modes.PERSPECTIVE;},
 	};
-	write("projection", "projection: ");
-	dropDown("dropdown", "dropdown", options);
 	// NOTE: this is a parameter dictionary used to create the event listeners to perform the function defined 
 	var key_events = {
 		'a': function () { theta += 0.1; },
@@ -99,10 +97,6 @@ window.onload = function init() {
 		'[': function () { cyllinder.radius -= 1; },
 		']': function () { cyllinder.radius += 1; }
 	};
-	
-	readObjectFromFile( (obj) => {
-		object = obj;
-	});
 
 	keys(key_events);
 	animate(
