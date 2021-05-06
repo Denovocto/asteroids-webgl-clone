@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Asteroids in webgl</title>
+
+        <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        precision mediump float;
+        in vec3 aPosition;
+        in vec3 aColor;
+        out vec3 vColor;
+        uniform mat4 tMatrix;
+        uniform mat4 vMatrix;
+        uniform mat4 pMatrix;
+        
+        void main()
+        {
+            vColor = aColor;
+            vec4 position = pMatrix * vMatrix * tMatrix  * vec4(aPosition, 1);
+            gl_Position = position;
+        }
+        </script>
+        
+        <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es
+        precision mediump float;
+        out vec4 fColor;
+        in vec3 vColor;
+        void main()
+        {
+            fColor = vec4(vColor, 1.0 );
+        }
+        </script>
+        <script type="text/javascript" src="Common/initShaders.js"></script>
+        <script type="text/javascript" src="Common/MV.js"></script>
+        <script type="text/javascript" src="geometry/shapes.js"></script>
+        <script type="text/javascript" src="UI/uiElements.js"></script>
+        <script type="text/javascript" src="geometry/transformations.js"></script>
+        <script type="text/javascript" src="animation/animation.js"></script>
+        <script type="text/javascript" src="Camera/camera.js"></script>
+        <script type="text/javascript" src="IO/files.js"></script>
+        <script type="text/javascript" src="objects.js"></script>
+    </head>
+
+    <body>
+        <canvas id="gl-canvas" width="500" height="500">>
+        Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+        <div id="files" style="text-align: left;" accept=".smf, .obj">
+            <input type="file" id="file-selector" single>
+        </div>
+        <div id="container"></div>
+        <br>
+    </body>
+</html>
