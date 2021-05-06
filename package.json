@@ -4,7 +4,8 @@
   "description": "asteroids webgl clone",
   "main": "asteroids.js",
   "scripts": {
-    "test": "npx serve && wget http://localhost:5000/asteroids.html"
+    "serve": "npx serve",
+    "test": "wget http://localhost:5000/asteroids.html"
   },
   "repository": {
     "type": "git",
