@@ -80,7 +80,7 @@ window.onload = function init() {
 	gl = canvas.getContext('webgl2');
 	if (!gl) {alert("WebGL 2.0 isn't available");}
 	gl.viewport(0, 0, canvas.width, canvas.height);
-	gl.clearColor(1.0, 1.0, 1.0, 1.0);
+	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.clear( gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 	program = initShaders(gl, "vertex-shader", "fragment-shader");
 	gl.useProgram(program);
@@ -105,17 +105,8 @@ window.onload = function init() {
 	});
 
 	keys(key_events);
-	write("keys", "Use {W, A, S, D, [, ] } keys to interact with the camera. ");
-	write("X", "A & D keys rotate the camera about the circle at the height of a cyllinder");
-	write("Y", "W & S keys control the camera's y-axis by positioning it at the height of a cyllinder");
-	write("radius-instructions", "[, ] keys control the distance between the camera and the origin by increasing the radius of the cyllinder");
-	write("dimensions", "The cyllinder's dimensions are as follows: ");
 	animate(
 	function () {
-		write("height", "height: ", cyllinder.height);
-		write("radius", "radius: ", cyllinder.radius);
-		write("t", "the coordinate of the camera in the top circle of the cyllinder is defined by theta:");
-		write("theta", "theta: ", theta);
 		changeView(camera);
 		changePerspective(selection == projection_modes.ORTHOGONAL ? orthogonalProj : perspectiveProj);
 		drawObject(object, object.colors, transform, colorization_type.MULTI, gl.TRIANGLES);
