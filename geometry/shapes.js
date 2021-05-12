@@ -73,26 +73,55 @@ function drawCircle(center_x, center_y, radius, up2degrees, theta, colors, squis
 	// gl.drawElements(gl., count, type, offset)
 	gl.drawArrays(draw_mode, 0, vertices.length);
 }
-// TODO: update to dictionary
-function drawCirclePoints(center_x, center_y, radius, segments, theta, colors, colorization_option = colorization_type.SINGLE, draw_mode = gl.TRIANGLE_FAN)
+function drawCirclePoints(transform_params = transform_default, segments, colors, colorization_option = colorization_type.SINGLE, draw_mode = gl.TRIANGLE_FAN)
 {
-	var vertices = [];
-	vertices.push(vec2(0, 0));
+	var vertexes = [];
+	var radius = transform.distance;
+	vertexes.push(vec3(0, 0, 0));
 	for (i = 0; i <= segments; i++) 
 	{
-		vertices.push(vec2(
+		vertexes.push(vec3(
 			radius * Math.sin(i / segments * Math.PI * 2),
-			radius * Math.cos(i / segments * Math.PI * 2)
+			radius * Math.cos(i / segments * Math.PI * 2),
+			0
 		));
 	}
-	initBuffers(vertices, colors, colorization_option);
+	var buffers = initBuffers(vertexes, colors, [], colorization_option, dimension.TWO);
 	var tMatrixLocation = gl.getUniformLocation(program, "tMatrix");
-	var translation = translationMatrix3(center_x, center_y);
-	var rMatrix = rotationMatrix3(theta);
-	var matrix = multiplyMatrix3(rMatrix, translation, 3, 3, 3);
-	gl.uniformMatrix3fv(tMatrixLocation, false, matrix);
-	gl.drawArrays(draw_mode, 0, vertices.length);
+
+	var scale = scaleMatrix4(transform_params["scale"][0], transform_params["scale"][1], transform_params["scale"][2]);
+	var rotate = rotationMatrix4(transform_params["thetas"]);
+	var translation = translationMatrix4(transform_params["center"][0], transform_params["center"][1], transform_params["center"][2]);
+
+	var matrix = multiplyMatrix(scale, rotate, 4, 4, 4);
+	matrix = multiplyMatrix(matrix, translation, 4, 4, 4);
+	gl.uniformMatrix4fv(tMatrixLocation, false, matrix);
+	gl.drawArrays(draw_mode, 0, vertexes.length);
+	gl.deleteBuffer(buffers.vertexBuffer);
+	gl.deleteBuffer(buffers.indexBuffer);
+	gl.deleteBuffer(buffers.colorBuffer);
 }
+function generateAsteroid(radius, segments)
+{
+	var vertexes = [];
+	for (i = 1; i <= segments; i++) 
+	{
+		var quantity = Math.random() * 0.2 * radius;
+		var sum = Math.floor(Math.random() * 2);
+		sum == Boolean(sum);
+		var x = radius * Math.sin(i / segments * Math.PI * 2);
+		var y = radius * Math.cos(i / segments * Math.PI * 2);
+		
+		vertexes.push(vec3(
+			sum ? x + quantity : x - quantity,
+			sum ? y + quantity : y - quantity,
+			0
+		));
+	}
+
+	return vertexes;
+}
+
 // TODO: update to dictionary
 function generateCircleColorSpectrum(segments)
 {
@@ -122,14 +151,22 @@ function drawTriangle(center_x, center_y, distance, theta, colors, colorization_
 	gl.uniformMatrix3fv(tMatrixLocation, false, matrix);
 	gl.drawArrays(draw_mode, 0, 3);
 }
-// TODO: update to dictionary
-function draw(vertices, theta, colors, colorization_option = colorization_type.SINGLE, draw_mode = gl.TRIANGLE_FAN)
+function draw(vertexes, colors, transform_params = transform_default, colorization_option = colorization_type.SINGLE, draw_mode = gl.TRIANGLE_FAN)
 {
-	initBuffers(vertices, colors, colorization_option);
+	var buffers = initBuffers(vertexes, colors, [], colorization_option, dimension.TWO);
 	var tMatrixLocation = gl.getUniformLocation(program, "tMatrix");
-	var rMatrix = rotationMatrix3(theta);
-	gl.uniformMatrix3fv(tMatrixLocation, false, rMatrix);
-	gl.drawArrays(draw_mode, 0, vertices.length);
+
+	var scale = scaleMatrix4(transform_params["scale"][0], transform_params["scale"][1], transform_params["scale"][2]);
+	var rotate = rotationMatrix4(transform_params["thetas"]);
+	var translation = translationMatrix4(transform_params["center"][0], transform_params["center"][1], transform_params["center"][2]);
+
+	var matrix = multiplyMatrix(scale, rotate, 4, 4, 4);
+	matrix = multiplyMatrix(matrix, translation, 4, 4, 4);
+	gl.uniformMatrix4fv(tMatrixLocation, false, matrix);
+	gl.drawArrays(draw_mode, 0, vertexes.length);
+	gl.deleteBuffer(buffers.vertexBuffer);
+	gl.deleteBuffer(buffers.indexBuffer);
+	gl.deleteBuffer(buffers.colorBuffer);
 }
 /** 
  * @param  {Object} transform_params is a parameter dictionary which contains, the transforms to be performed on the cube as well as its dimensions.
