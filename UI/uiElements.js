@@ -56,7 +56,7 @@ function dropDown(name, id, menu_options)
  */
 function keys(key_events = {})
 {
-    document.onkeydown = function (e) {
+    document.onkeypress = function (e) {
         if(e.key != undefined){
             for(key in key_events) {
                 if(e.key.toLowerCase() == key){
