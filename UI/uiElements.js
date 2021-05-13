@@ -54,16 +54,16 @@ function dropDown(name, id, menu_options)
  * @param  {Object} key_events is a dictionary in which the keys to be presses are the keys all in lowercase, and the values are the functions to be performed once pressed.
  * @return {None}
  */
-function keys(key_events = {})
+function keys(keysPressed = {})
 {
-    document.onkeypress = function (e) {
+    document.onkeydown = function (e) {
         if(e.key != undefined){
-            for(key in key_events) {
-                if(e.key.toLowerCase() == key){
-                    key_events[key]();
-                    break;
-                }
-            }
+            keysPressed[e.key.toLowerCase()] = true;
+        }
+    };
+    document.onkeyup = function (e) {
+        if(e.key != undefined){
+            keysPressed[e.key.toLowerCase()] = false;
         }
     };
 }

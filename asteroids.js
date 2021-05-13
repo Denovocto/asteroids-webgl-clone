@@ -11,8 +11,8 @@ var transform = {
 };
 
 var shipTransform = {
-	thetas: [0, 0, 0],
-	center: [0, -0.5, 0],
+	thetas: [0, 0, 90],
+	center: [0, 0, 0],
 	scale: [0.05, 0.05, 1],
 	distance: 1,
 }
@@ -22,42 +22,6 @@ var ship = {
 	acceleration: [0, 0],
 }
 
-var object = {
-	vertexes: [
-		vec3(-0.5, -0.5, 0.5),
-		vec3(-0.5, 0.5, 0.5),
-		vec3(0.5, 0.5, 0.5),
-		vec3(0.5, -0.5, 0.5),
-		vec3(-0.5, -0.5, -0.5),
-		vec3(-0.5, 0.5, -0.5),
-		vec3(0.5, 0.5, -0.5),
-		vec3(0.5, -0.5, -0.5)
-	],
-	indexes: [
-		1, 0, 3,
-		3, 2, 1,
-		2, 3, 7,
-		7, 6, 2,
-		3, 0, 4,
-		4, 7, 3,
-		6, 5, 1,
-		1, 2, 6,
-		4, 5, 6,
-		6, 7, 4,
-		5, 4, 0,
-		0, 1, 5
-	],
-	colors: [
-        vec3( 0.0, 0.0, 0.0),  // black
-        vec3( 1.0, 0.0, 0.0),  // red
-        vec3( 1.0, 1.0, 0.0),  // yellow
-        vec3( 0.0, 1.0, 0.0),  // green
-        vec3( 0.0, 0.0, 1.0),  // blue
-        vec3( 1.0, 0.0, 1.0),  // magenta
-        vec3( 0.0, 0.0, 0.0),  // white
-        vec3( 0.0, 1.0, 1.0)   // cyan
-	]
-};
 var camera = {
 	eye: vec3(0, 0, 0),
 	at: vec3(0, 0, 0),
@@ -88,13 +52,23 @@ window.onload = function init() {
 	program = initShaders(gl, "vertex-shader", "fragment-shader");
 	gl.useProgram(program);
 	// NOTE: this is a parameter dictionary used to create the event listeners to perform the function defined 
+	var keys_pressed = {};
 	var key_events = {
-		'a': function () { shipTransform.thetas[2] -= 500 * deltaTime;},
-		'd': function () { shipTransform.thetas[2] += 500 * deltaTime;},
+		'a': function () { 
+							console.log("theta: ", shipTransform.thetas[2]);
+							shipTransform.thetas[2] -= 100 * deltaTime;
+						},
+		'd': function () {
+							console.log("theta: ", shipTransform.thetas[2]);
+							shipTransform.thetas[2] += 100 * deltaTime;
+						},
 		'w': function () {
 							ship.acceleration = 1 * deltaTime;
-							ship.velocity[0] += Math.cos(shipTransform.thetas[2]) * ship.acceleration;
-							ship.velocity[1] += Math.sin(shipTransform.thetas[2]) * ship.acceleration;
+							console.log("theta: ", shipTransform.thetas[2]);
+							console.log("x: ", Math.cos(radians(shipTransform.thetas[2])) * ship.acceleration);
+							console.log("y: ", Math.sin(radians(shipTransform.thetas[2])) * ship.acceleration);
+							ship.velocity[0] += Math.cos(radians(shipTransform.thetas[2])) * ship.acceleration;
+							ship.velocity[1] += Math.sin(radians(shipTransform.thetas[2])) * ship.acceleration;
 						},
 		's': function () {
 							ship.velocity[0] = 0;
@@ -103,8 +77,7 @@ window.onload = function init() {
 		'[': function () { cyllinder.radius -= 1; },
 		']': function () { cyllinder.radius += 1; }
 	};
-
-	keys(key_events);
+	keys(keys_pressed);
 
 	var asteroid = generateAsteroid(0.2, 7);
 	animate(
@@ -115,17 +88,23 @@ window.onload = function init() {
 		drawCirclePoints(shipTransform, 3, vec3(1, 1, 1), colorization_type.SINGLE, gl.TRIANGLE_FAN);
 	},
 	function () {
+		for(key in keys_pressed){
+			if(keys_pressed[key])
+			{
+				key_events[key]();
+			}
+		}
 		if (ship.velocity[0] < 2){
-			ship.velocity[0] *= 0.95;
+			ship.velocity[0] *= 0.10;
 		}
 		else if (ship.velocity[0] > 2){
-			ship.velocity[0] *= 0.95;
+			ship.velocity[0] *= 0.10;
 		}
 		if (ship.velocity[1] < 2){
-			ship.velocity[1] *= 0.95;
+			ship.velocity[1] *= 0.10;
 		}
 		else if (ship.velocity[1] > 2){
-			ship.velocity[1] *= 0.95;
+			ship.velocity[1] *= 0.10;
 		}
 		shipTransform.center[0] += ship.velocity[0];
 		shipTransform.center[1] += ship.velocity[1];
