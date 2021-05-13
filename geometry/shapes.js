@@ -76,7 +76,7 @@ function drawCircle(center_x, center_y, radius, up2degrees, theta, colors, squis
 function drawCirclePoints(transform_params = transform_default, segments, colors, colorization_option = colorization_type.SINGLE, draw_mode = gl.TRIANGLE_FAN)
 {
 	var vertexes = [];
-	var radius = transform.distance;
+	var radius = transform_params.distance;
 	vertexes.push(vec3(0, 0, 0));
 	for (i = 0; i <= segments; i++) 
 	{
@@ -101,8 +101,9 @@ function drawCirclePoints(transform_params = transform_default, segments, colors
 	gl.deleteBuffer(buffers.indexBuffer);
 	gl.deleteBuffer(buffers.colorBuffer);
 }
-function generateAsteroid(radius, segments)
+function generateAsteroid(transform, segments)
 {
+	var radius = transform["distance"];
 	var vertexes = [];
 	for (i = 1; i <= segments; i++) 
 	{

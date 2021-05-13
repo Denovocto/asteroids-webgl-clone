@@ -6,15 +6,15 @@ var gl;
 var transform = {
 	thetas: [0, 0, 0],
 	center: [0, 0, 0],
-	scale: [0.1, 0.1, 1],
-	distance: 1,
+	scale: [1, 1, 1],
+	distance: 0.2,
 };
 
 var shipTransform = {
 	thetas: [0, 0, 90],
 	center: [0, 0, 0],
-	scale: [0.05, 0.05, 1],
-	distance: 1,
+	scale: [1, 1, 1],
+	distance: 0.05,
 }
 
 var ship = {
@@ -55,18 +55,18 @@ window.onload = function init() {
 	var keys_pressed = {};
 	var key_events = {
 		'a': function () { 
-							console.log("theta: ", shipTransform.thetas[2]);
+							// console.log("theta: ", shipTransform.thetas[2]);
 							shipTransform.thetas[2] -= 100 * deltaTime;
 						},
 		'd': function () {
-							console.log("theta: ", shipTransform.thetas[2]);
+							// console.log("theta: ", shipTransform.thetas[2]);
 							shipTransform.thetas[2] += 100 * deltaTime;
 						},
 		'w': function () {
 							ship.acceleration = 1 * deltaTime;
-							console.log("theta: ", shipTransform.thetas[2]);
-							console.log("x: ", Math.cos(radians(shipTransform.thetas[2])) * ship.acceleration);
-							console.log("y: ", Math.sin(radians(shipTransform.thetas[2])) * ship.acceleration);
+							// console.log("theta: ", shipTransform.thetas[2]);
+							// console.log("x: ", Math.cos(radians(shipTransform.thetas[2])) * ship.acceleration);
+							// console.log("y: ", Math.sin(radians(shipTransform.thetas[2])) * ship.acceleration);
 							ship.velocity[0] += Math.cos(radians(shipTransform.thetas[2])) * ship.acceleration;
 							ship.velocity[1] += Math.sin(radians(shipTransform.thetas[2])) * ship.acceleration;
 						},
@@ -79,13 +79,14 @@ window.onload = function init() {
 	};
 	keys(keys_pressed);
 
-	var asteroid = generateAsteroid(0.2, 7);
+	var asteroid = generateAsteroid(transform, 7);
 	animate(
 	function () {
 		changeView(camera);
 		changePerspective(orthogonalProj);
 		draw(asteroid, vec3(1,1,1), transform, colorization_type.SINGLE, gl.LINE_LOOP);
-		drawCirclePoints(shipTransform, 3, vec3(1, 1, 1), colorization_type.SINGLE, gl.TRIANGLE_FAN);
+		if (!collision(shipTransform, transform))
+			drawCirclePoints(shipTransform, 3, vec3(1, 1, 1), colorization_type.SINGLE, gl.TRIANGLE_FAN);
 	},
 	function () {
 		for(key in keys_pressed){
@@ -109,4 +110,28 @@ window.onload = function init() {
 		shipTransform.center[0] += ship.velocity[0];
 		shipTransform.center[1] += ship.velocity[1];
 	});
+};
+
+
+function collision(ship, asteroid){ //problema con distance
+
+	var collisionX, collisionY;
+	var ax = parseFloat(ship["center"][0].toFixed(2)) - ship["distance"];
+	var bx = parseFloat(ship["center"][0].toFixed(2)) + ship["distance"];
+	var cx = parseFloat(asteroid["center"][0].toFixed(2)) - asteroid["distance"];
+	var dx = parseFloat(asteroid["center"][0].toFixed(2)) + asteroid["distance"];
+	var ay = parseFloat(ship["center"][1].toFixed(2)) - ship["distance"];
+	var by = parseFloat(ship["center"][1].toFixed(2)) + ship["distance"];
+	var cy = parseFloat(asteroid["center"][1].toFixed(2)) - asteroid["distance"];
+	var dy = parseFloat(asteroid["center"][1].toFixed(2)) + asteroid["distance"];
+	// collision x-axis?aw
+    collisionX = (bx > cx && bx < dx) || (ax < dx && ax > cx); 
+    // collision y-axis?
+    collisionY = (by > cy && by < dy) || (ay < dy && ay > cy);
+    // collision only if on both axes
+	// console.log(parseFloat(ship["center"][0].toFixed(2)) - ship["distance"]);
+	// console.log(cx);
+	// console.log((bx > cx));
+	return collisionX && collisionY;
+	// console.log("both: ", collisionX && collisionY);
 };
