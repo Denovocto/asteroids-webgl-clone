@@ -13,3 +13,17 @@ function collision(ship, asteroid){ //problema con distance
     collisionY = (by > cy && by < dy) || (ay < dy && ay > cy);
 	return collisionX && collisionY;
 };
+function torusGeometry(transform)
+{
+    if (transform["center"][0] > 1) {
+        transform["center"][0] = -1;
+    } else if (transform["center"][0] < -1) {
+        transform["center"][0] = 1;
+    }
+    
+    if (transform["center"][1] > 1) {
+        transform["center"][1] = -1;
+    } else if (transform["center"][0] < -1) {
+        transform["center"][1] = 1;
+    }
+}

@@ -3,12 +3,18 @@ var canvas;
 var gl;
 
 // NOTE: Used to construct transforms after being passed down to drawCube()
-var transform = {
+var asteroidTransform = {
 	thetas: [0, 0, 0],
 	center: [0, 0, 0],
 	scale: [1, 1, 1],
 	distance: 0.2,
 };
+
+var asteroidSpeed = {
+	velocity: [0, 0],
+	acceleration: 0,
+	heading: 20
+}
 
 var shipTransform = {
 	thetas: [0, 0, 0],
@@ -19,7 +25,7 @@ var shipTransform = {
 
 var ship = {
 	velocity: [0, 0],
-	acceleration: [0, 0],
+	acceleration: 0,
 	heading: 0
 }
 
@@ -48,6 +54,8 @@ var cyllinder = {
 };
 
 var theta = 0;
+
+var deltaTime = 1/60;
 window.onload = function init() {
 	canvas = document.getElementById("gl-canvas");
 	gl = canvas.getContext('webgl2');
@@ -70,7 +78,7 @@ window.onload = function init() {
 
 						},
 		'w': function () {
-							ship.acceleration = 5 * deltaTime;
+							ship.acceleration = 0.01 * deltaTime;
 							// console.log("theta: ", shipTransform.thetas[2]);
 							// console.log("x: ", Math.cos(radians(shipTransform.thetas[2])) * ship.acceleration);
 							// console.log("y: ", Math.sin(radians(shipTransform.thetas[2])) * ship.acceleration);
@@ -97,37 +105,74 @@ window.onload = function init() {
 						}
 	};
 	keys(keys_pressed);
-
-	var asteroid = generateAsteroid(transform, 7);
+	var asteroidList = [];
+	for (var i = 1; i <= 7; i++)
+	{
+		var x = 0;
+		var y = 0;
+		while(x <= 0.2 && x >= -0.2 && y <= 0.2 && y >= -0.2)
+		{
+			x = Math.random() * 1 * (Math.round(Math.random()) ? 1 : -1);
+			y = Math.random() * 1 * (Math.round(Math.random()) ? 1 : -1);
+		}
+		var asteroidTranform = {
+			thetas: [0, 0, 0],
+			center: [x, y, 0],
+			scale: [1, 1, 1],
+			distance: Math.random() * 2 / 10
+		}
+		var asteroidObject = generateAsteroid(asteroidTransform, Math.floor(Math.random() * 6) + 5);
+		var asteroidMovement = {
+			velocity: [0, 0],
+			acceleration: 0,
+			heading: Math.random() * 361
+		}
+		asteroidList.push({transform: asteroidTranform, object: asteroidObject, movement: asteroidMovement});
+	}
+	console.log(asteroidList);
 	animate(
 	function () {
 		changeView(camera);
 		changePerspective(orthogonalProj);
-		draw(asteroid, vec3(1,1,1), transform, colorization_type.SINGLE, gl.LINE_LOOP);
+		torusGeometry(shipTransform);
+		torusGeometry(asteroidList[0].transform);
+		draw(asteroidList[0].object, vec3(1,1,1), asteroidList[0].transform, colorization_type.SINGLE, gl.LINE_LOOP);
 		// if (!collision(shipTransform, transform))
+
+		//var ranNum = Math.random() * 1 * (Math.round(Math.random()) ? 1 : -1)
+
 		drawTriangle(shipTransform, vec3(1, 1, 1), colorization_type.SINGLE, gl.LINE_LOOP);
 	},
 	function () {
-		for(key in keys_pressed){
-			if(keys_pressed[key] && key_events[key])
-			{
-				key_events[key]();
-			}
-		}
-		if (ship.velocity[0] < 2){
-			ship.velocity[0] *= 0.10;
-		}
-		else if (ship.velocity[0] > 2){
-			ship.velocity[0] *= 0.10;
-		}
-		if (ship.velocity[1] < 2){
-			ship.velocity[1] *= 0.10;
-		}
-		else if (ship.velocity[1] > 2){
-			ship.velocity[1] *= 0.10;
-		}
-		// shipTransform["thetas"][0] = Math.atan2(ship.velocity[1] / ship.velocity[0]);
-		shipTransform.center[0] += ship.velocity[0];
-		shipTransform.center[1] += ship.velocity[1];
+		executeKeys(keys_pressed, key_events);
+		updateAsteroidPosition(asteroidList[0], deltaTime);
+		updateShipPosition();
+
 	});
-};
+}
+
+function executeKeys(keys_pressed, key_events)
+{
+	for(key in keys_pressed){
+		if(keys_pressed[key] && key_events[key])
+		{
+			key_events[key]();
+		}
+	}
+}
+function updateAsteroidPosition(asteroid, delta)
+{
+	asteroid.movement.acceleration = 0.05 * delta;
+	asteroid.movement.velocity[0] = Math.cos(radians(asteroid.movement.heading)) * asteroid.movement.acceleration;
+	asteroid.movement.velocity[1] = Math.sin(radians(asteroid.movement.heading)) * asteroid.movement.acceleration;
+	asteroid.transform.center[0] += asteroid.movement.velocity[0];
+	asteroid.transform.center[1] += asteroid.movement.velocity[1];
+}
+function updateShipPosition()
+{
+	shipTransform.center[0] += ship.velocity[0];
+	shipTransform.center[1] += ship.velocity[1];
+}
+
+
+//Math.floor(Math.random() * 361);     // returns a random integer from 0 to 360 
