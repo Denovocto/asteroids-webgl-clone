@@ -123,6 +123,28 @@ function generateAsteroid(transform, segments)
 	return vertexes;
 }
 
+function drawBullet(transform_params = transform_default, color)
+{
+	var pSize = gl.getUniformLocation(program, "pSize");
+	gl.uniform1f(pSize, transform_params["distance"]);
+	var buffers = initBuffers([vec3(0, 0, 0)], color, [], colorization_type.SINGLE, dimension.TWO);
+
+	var tMatrixLocation = gl.getUniformLocation(program, "tMatrix");
+
+	var scale = scaleMatrix4(1, 1, 1);
+	var rotate = rotationMatrix4(transform_default["thetas"]);
+	var translation = translationMatrix4(transform_params["center"][0], transform_params["center"][1], 0);
+
+	var matrix = multiplyMatrix(scale, rotate, 4, 4, 4);
+	matrix = multiplyMatrix(matrix, translation, 4, 4, 4);
+	gl.uniformMatrix4fv(tMatrixLocation, false, matrix);
+	gl.drawArrays(gl.POINTS, 0, 1);
+	
+	gl.deleteBuffer(buffers.vertexBuffer);
+	gl.deleteBuffer(buffers.indexBuffer);
+	gl.deleteBuffer(buffers.colorBuffer);
+}
+
 // TODO: update to dictionary
 function generateCircleColorSpectrum(segments)
 {
@@ -138,19 +160,27 @@ function generateCircleColorSpectrum(segments)
 	return circle_colors;
 }
 // TODO: update to dictionary
-function drawTriangle(center_x, center_y, distance, theta, colors, colorization_option = colorization_type.SINGLE, draw_mode = gl.TRIANGLE_FAN){
-	var vertices = [
-		vec2(0, distance),
-		vec2(distance, -distance),
-		vec2(-distance, -distance)
+function drawTriangle(transform_params = transform_default, colors, colorization_option = colorization_type.SINGLE, draw_mode = gl.TRIANGLE_FAN){
+	var distance = transform_params["distance"];
+	var vertexes = [
+		vec3(0, distance, 0),
+		vec3(distance, -distance, 0),
+		vec3(-distance, -distance, 0)
 	];
-	var program = initBuffers(vertices, colors, colorization_option);
+	var buffers = initBuffers(vertexes, colors, [], colorization_option, dimension.TWO);
 	var tMatrixLocation = gl.getUniformLocation(program, "tMatrix");
-	var translation = translationMatrix3(center_x, center_y);
-	var rMatrix = rotationMatrix3(theta);
-	var matrix = multiplyMatrix3(rMatrix, translation, 3, 3, 3);
-	gl.uniformMatrix3fv(tMatrixLocation, false, matrix);
+
+	var scale = scaleMatrix4(transform_params["scale"][0], transform_params["scale"][1], transform_params["scale"][2]);
+	var rotate = rotationMatrix4(transform_params["thetas"]);
+	var translation = translationMatrix4(transform_params["center"][0], transform_params["center"][1], transform_params["center"][2]);
+
+	var matrix = multiplyMatrix(scale, rotate, 4, 4, 4);
+	matrix = multiplyMatrix(matrix, translation, 4, 4, 4);
+	gl.uniformMatrix4fv(tMatrixLocation, false, matrix);
 	gl.drawArrays(draw_mode, 0, 3);
+	gl.deleteBuffer(buffers.vertexBuffer);
+	gl.deleteBuffer(buffers.indexBuffer);
+	gl.deleteBuffer(buffers.colorBuffer);
 }
 function draw(vertexes, colors, transform_params = transform_default, colorization_option = colorization_type.SINGLE, draw_mode = gl.TRIANGLE_FAN)
 {

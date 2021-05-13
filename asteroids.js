@@ -11,7 +11,7 @@ var transform = {
 };
 
 var shipTransform = {
-	thetas: [0, 0, 90],
+	thetas: [0, 0, 0],
 	center: [0, 0, 0],
 	scale: [1, 1, 1],
 	distance: 0.05,
@@ -20,6 +20,12 @@ var shipTransform = {
 var ship = {
 	velocity: [0, 0],
 	acceleration: [0, 0],
+	heading: 0
+}
+
+var bullet = {
+	center: [0, 0, 0],
+	distance: 2
 }
 
 var camera = {
@@ -56,26 +62,39 @@ window.onload = function init() {
 	var key_events = {
 		'a': function () { 
 							// console.log("theta: ", shipTransform.thetas[2]);
-							shipTransform.thetas[2] -= 100 * deltaTime;
+							shipTransform.thetas[2] -= 200 * deltaTime;
 						},
 		'd': function () {
 							// console.log("theta: ", shipTransform.thetas[2]);
-							shipTransform.thetas[2] += 100 * deltaTime;
+							shipTransform.thetas[2] += 200 * deltaTime;
+
 						},
 		'w': function () {
-							ship.acceleration = 1 * deltaTime;
+							ship.acceleration = 5 * deltaTime;
 							// console.log("theta: ", shipTransform.thetas[2]);
 							// console.log("x: ", Math.cos(radians(shipTransform.thetas[2])) * ship.acceleration);
 							// console.log("y: ", Math.sin(radians(shipTransform.thetas[2])) * ship.acceleration);
-							ship.velocity[0] += Math.cos(radians(shipTransform.thetas[2])) * ship.acceleration;
-							ship.velocity[1] += Math.sin(radians(shipTransform.thetas[2])) * ship.acceleration;
+							if (shipTransform.thetas[2] == 0){
+								ship.heading = 90;
+							}
+							else if (shipTransform.thetas[2] > 0){
+								ship.heading = 90 - shipTransform.thetas[2];
+							}
+							else if (shipTransform.thetas[2] < 0){
+								ship.heading = 90 + shipTransform.thetas[2];
+							}
+							ship.velocity[0] += Math.cos(radians(ship.heading)) * ship.acceleration;
+							ship.velocity[1] += Math.sin(radians(ship.heading)) * ship.acceleration;
 						},
 		's': function () {
-							ship.velocity[0] = 0;
-							ship.velocity[1] = 0;
+							ship.velocity[0] -= Math.cos(radians(shipTransform.thetas[2] + 90)) * ship.acceleration;
+							ship.velocity[1] -= Math.sin(radians(shipTransform.thetas[2] + 90)) * ship.acceleration;
 						},
 		'[': function () { cyllinder.radius -= 1; },
-		']': function () { cyllinder.radius += 1; }
+		']': function () { cyllinder.radius += 1; },
+		' ': function() {
+							drawBullet(bullet, vec3(1, 1, 1));
+						}
 	};
 	keys(keys_pressed);
 
@@ -85,12 +104,12 @@ window.onload = function init() {
 		changeView(camera);
 		changePerspective(orthogonalProj);
 		draw(asteroid, vec3(1,1,1), transform, colorization_type.SINGLE, gl.LINE_LOOP);
-		if (!collision(shipTransform, transform))
-			drawCirclePoints(shipTransform, 3, vec3(1, 1, 1), colorization_type.SINGLE, gl.TRIANGLE_FAN);
+		// if (!collision(shipTransform, transform))
+		drawTriangle(shipTransform, vec3(1, 1, 1), colorization_type.SINGLE, gl.LINE_LOOP);
 	},
 	function () {
 		for(key in keys_pressed){
-			if(keys_pressed[key])
+			if(keys_pressed[key] && key_events[key])
 			{
 				key_events[key]();
 			}
@@ -107,31 +126,8 @@ window.onload = function init() {
 		else if (ship.velocity[1] > 2){
 			ship.velocity[1] *= 0.10;
 		}
+		// shipTransform["thetas"][0] = Math.atan2(ship.velocity[1] / ship.velocity[0]);
 		shipTransform.center[0] += ship.velocity[0];
 		shipTransform.center[1] += ship.velocity[1];
 	});
-};
-
-
-function collision(ship, asteroid){ //problema con distance
-
-	var collisionX, collisionY;
-	var ax = parseFloat(ship["center"][0].toFixed(2)) - ship["distance"];
-	var bx = parseFloat(ship["center"][0].toFixed(2)) + ship["distance"];
-	var cx = parseFloat(asteroid["center"][0].toFixed(2)) - asteroid["distance"];
-	var dx = parseFloat(asteroid["center"][0].toFixed(2)) + asteroid["distance"];
-	var ay = parseFloat(ship["center"][1].toFixed(2)) - ship["distance"];
-	var by = parseFloat(ship["center"][1].toFixed(2)) + ship["distance"];
-	var cy = parseFloat(asteroid["center"][1].toFixed(2)) - asteroid["distance"];
-	var dy = parseFloat(asteroid["center"][1].toFixed(2)) + asteroid["distance"];
-	// collision x-axis?aw
-    collisionX = (bx > cx && bx < dx) || (ax < dx && ax > cx); 
-    // collision y-axis?
-    collisionY = (by > cy && by < dy) || (ay < dy && ay > cy);
-    // collision only if on both axes
-	// console.log(parseFloat(ship["center"][0].toFixed(2)) - ship["distance"]);
-	// console.log(cx);
-	// console.log((bx > cx));
-	return collisionX && collisionY;
-	// console.log("both: ", collisionX && collisionY);
 };

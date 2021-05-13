@@ -14,12 +14,14 @@
         uniform mat4 tMatrix;
         uniform mat4 vMatrix;
         uniform mat4 pMatrix;
+        uniform float pSize;
         
         void main()
         {
             vColor = aColor;
             vec4 position = pMatrix * vMatrix * tMatrix  * vec4(aPosition, 1);
             gl_Position = position;
+            gl_PointSize = pSize;
         }
         </script>
         
@@ -35,6 +37,7 @@
         </script>
         <script type="text/javascript" src="Common/initShaders.js"></script>
         <script type="text/javascript" src="Common/MV.js"></script>
+        <script type="text/javascript" src="physics/physics.js"></script>
         <script type="text/javascript" src="geometry/shapes.js"></script>
         <script type="text/javascript" src="UI/uiElements.js"></script>
         <script type="text/javascript" src="geometry/transformations.js"></script>
