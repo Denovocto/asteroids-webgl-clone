@@ -114,6 +114,7 @@ window.onload = function init() {
 	keys(keys_pressed);
 	attachSound("bullet", "./Assets/laser.mp3");
 	attachSound("crash", "./Assets/crash.mp3");
+	attachSound("explode", "./Assets/explode.mp3");
 	var asteroidList = generateAsteroids();
 	var bulletList = [];
 	animate(
@@ -164,6 +165,7 @@ window.onload = function init() {
 					bulletList.splice(j, 1);
 					var newAsteroid = generateAsteroids(1);
 					asteroidList.push(newAsteroid[0]);
+					document.getElementById("explode").play();
 					// var tinyAsteroids = generateTinyAsteoids(asteroidList[i].transform.center[0], asteroidList[i].transform.center[1], 0.1);
 					// for (var k = 0; k < tinyAsteroids.length; k++)
 					// {
