@@ -90,3 +90,15 @@ function write(id, message, value = null){
     }
     
 }
+
+function attachSound(id, filename){
+    var element = document.createElement("audio");
+    element.id = id;
+    element.src = filename;
+    try {
+        document.getElementById("container").replaceChild(element, document.getElementById(id));
+    } catch {
+        document.getElementById("container").appendChild(element);
+    }
+    return document.getElementById("id");
+}

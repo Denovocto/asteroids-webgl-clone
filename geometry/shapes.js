@@ -120,7 +120,7 @@ function generateAsteroid(transform, segments)
 		));
 	}
 
-	return vertexes;
+	return vertexes; 
 }
 
 function drawBullet(transform_params = transform_default, color)

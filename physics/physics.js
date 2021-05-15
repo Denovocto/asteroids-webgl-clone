@@ -1,4 +1,4 @@
-function collision(ship, asteroid){ //problema con distance
+function asteroidCollision(ship, asteroid){ //problema con distance
 
 	var collisionX, collisionY;
 	var ax = parseFloat(ship["center"][0].toFixed(2)) - ship["distance"];
@@ -12,7 +12,22 @@ function collision(ship, asteroid){ //problema con distance
     collisionX = (bx > cx && bx < dx) || (ax < dx && ax > cx); 
     collisionY = (by > cy && by < dy) || (ay < dy && ay > cy);
 	return collisionX && collisionY;
-};
+}
+
+function bulletCollision(asteroid, bullet){
+    var collisionX, collisionY;
+	var ax = parseFloat(bullet["center"][0].toFixed(2));
+	var bx = parseFloat(bullet["center"][0].toFixed(2));
+	var cx = parseFloat(asteroid["center"][0].toFixed(2)) - asteroid["distance"];
+	var dx = parseFloat(asteroid["center"][0].toFixed(2)) + asteroid["distance"];
+	var ay = parseFloat(bullet["center"][1].toFixed(2));
+	var by = parseFloat(bullet["center"][1].toFixed(2));
+	var cy = parseFloat(asteroid["center"][1].toFixed(2)) - asteroid["distance"];
+	var dy = parseFloat(asteroid["center"][1].toFixed(2)) + asteroid["distance"];
+    collisionX = (bx > cx && bx < dx) || (ax < dx && ax > cx); 
+    collisionY = (by > cy && by < dy) || (ay < dy && ay > cy);
+	return collisionX && collisionY;
+}
 function torusGeometry(transform)
 {
     if (transform["center"][0] > 1) {
@@ -23,7 +38,7 @@ function torusGeometry(transform)
     
     if (transform["center"][1] > 1) {
         transform["center"][1] = -1;
-    } else if (transform["center"][0] < -1) {
+    } else if (transform["center"][1] < -1) {
         transform["center"][1] = 1;
     }
 }
