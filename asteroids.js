@@ -116,6 +116,7 @@ window.onload = function init() {
 	attachSound("bullet", "./Assets/laser.mp3");
 	attachSound("crash", "./Assets/crash.mp3");
 	attachSound("explode", "./Assets/explode.mp3");
+	write("instructions", "use WASD to move and space to shoot.");
 	var asteroidList = generateAsteroids();
 	var bulletList = [];
 	animate(
