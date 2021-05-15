@@ -89,6 +89,7 @@ window.onload = function init() {
 							ship.velocity[1] += Math.sin(radians(ship.heading)) * ship.acceleration;
 						},
 		's': function () {
+							ship.acceleration = 0.01 * deltaTime;
 							if (shipTransform.thetas[2] == 0){
 								ship.heading = 90;
 							}
@@ -148,30 +149,33 @@ window.onload = function init() {
 		for(var i = 0; i < asteroidList.length; i++)
 		{
 			// collision asteroid ship
-			if (asteroidCollision(shipTransform, asteroidList[i].transform))
+			if(lives > 0)
 			{
-				asteroidList.splice(i, 1);
-				hit = true;
-				document.getElementById("crash").play();
-				break;
-			}
-			// collision asteroid bullet
-			for (var j = 0; j < bulletList.length ; j++)
-			{
-				if (bulletCollision(asteroidList[i].transform, bulletList[j]))
+				if (asteroidCollision(shipTransform, asteroidList[i].transform))
 				{
-					score += 100;
 					asteroidList.splice(i, 1);
-					bulletList.splice(j, 1);
-					var newAsteroid = generateAsteroids(1);
-					asteroidList.push(newAsteroid[0]);
-					document.getElementById("explode").play();
-					// var tinyAsteroids = generateTinyAsteoids(asteroidList[i].transform.center[0], asteroidList[i].transform.center[1], 0.1);
-					// for (var k = 0; k < tinyAsteroids.length; k++)
-					// {
-					// 	console.log(tinyAsteroids);
-					// 	asteroidList.push(tinyAsteroids[k]);
-					// }
+					hit = true;
+					document.getElementById("crash").play();
+					break;
+				}
+				// collision asteroid bullet
+				for (var j = 0; j < bulletList.length ; j++)
+				{
+					if (bulletCollision(asteroidList[i].transform, bulletList[j]))
+					{
+						score += 100;
+						asteroidList.splice(i, 1);
+						bulletList.splice(j, 1);
+						var newAsteroid = generateAsteroids(1);
+						asteroidList.push(newAsteroid[0]);
+						document.getElementById("explode").play();
+						// var tinyAsteroids = generateTinyAsteoids(asteroidList[i].transform.center[0], asteroidList[i].transform.center[1], 0.1);
+						// for (var k = 0; k < tinyAsteroids.length; k++)
+						// {
+						// 	console.log(tinyAsteroids);
+						// 	asteroidList.push(tinyAsteroids[k]);
+						// }
+					}
 				}
 			}
 		}
